@@ -5,6 +5,7 @@ const app = express();
 app.use(express.json());
 app.use('/', frontendRoutes);
 
-app.listen(5000, () => {
-  console.log('Frontend service running on port 5000');
+const PORT = 3000; // Defined PORT for the application
+app.listen(PORT, () => {
+  console.log(`Frontend service running on port ${PORT}`);
 });

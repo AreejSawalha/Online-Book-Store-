@@ -1,9 +1,16 @@
 const express = require('express');
-const { search, info, purchase } = require('../controllers/FrontendController');
+
 const router = express.Router();
+const {
+    searchItems,
+    getItemInfo,
+    purchaseItem
+} = require('../controllers/FrontendController'); // Import controller functions
 
-router.get('/search/:topic', search);
-router.get('/info/:item_number', info);
-router.post('/purchase/:item_number', purchase);
 
+router.get('/search/:topic', searchItems);
+router.get('/info/:item_number', getItemInfo);
+
+
+// Export the router
 module.exports = router;
