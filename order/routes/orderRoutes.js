@@ -4,7 +4,8 @@ const {
     getAllOrders,
     getOrderById,
     updateOrder,
-    deleteOrder
+    deleteOrder,
+    purchase
 } = require('../controllers/OrderController');
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.get('/list', getAllOrders);          // GET: Get all orders
 router.get('/:order_id', getOrderById);     // GET: Get order by ID
 router.put('/update/:order_id', updateOrder); // PUT: Update an existing order
 router.delete('/delete/:order_id', deleteOrder); // DELETE: Delet
+router.post('/purchase/:item_number', purchase); // newwwwwwwwwwwwwwwwwwwww 
 // Define routes for orders
 /*router.post('/order', createOrder);
 router.get('/orders', getAllOrders);

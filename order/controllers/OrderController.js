@@ -1,3 +1,4 @@
+const axios = require('axios');
 const {
   createOrder,
   getAllOrders,
@@ -61,6 +62,45 @@ exports.deleteOrder = (req, res) => {
   });
 };
 
+
+///////// newwwwwwwwwwwwwwwwwww ibtisam 
+// Purchase an item and log order
+exports.purchase = async (req, res) => {
+  const itemNumber = req.params.item_number;
+  console.log(`Processing purchase for item number: ${itemNumber}`);
+
+  try {
+    // Fetch item info from the catalog service
+    const response = await axios.get(`http://localhost:5001/catalog/query/item/${itemNumber}`);
+    console.log('Catalog response:', response.data);
+    const item = response.data;
+
+    // Check stock availability
+    if (item.stock > 0) {
+      console.log(`Stock available for item ${itemNumber}: ${item.stock}`);
+
+      // Reduce stock and update catalog
+      await axios.put(`http://localhost:5001/catalog/update/${itemNumber}`, { stock: item.stock - 1, price: item.price });
+      console.log('Stock updated in catalog');
+
+      // Log the order
+      createOrder('Anonymous', item.price, [itemNumber], (err, orderId) => {
+        if (err) {
+          console.error('Error creating order:', err);
+          return res.status(500).send('Error creating order');
+        }
+        console.log('Order created successfully, orderId:', orderId);
+        res.json({ message: 'Purchase successful', order_id: orderId });
+      });
+    } else {
+      console.log(`Item ${itemNumber} is sold out`);
+      res.status(400).send('Item is sold out');
+    }
+  } catch (error) {
+    console.error('Error processing purchase:', error);
+    res.status(500).json({ error: 'Error processing purchase' });
+  }
+};
 
 
 
