@@ -52,35 +52,19 @@ const getItemInfo = async (req, res) => {
 
 
 const purchaseController = async (req, res) => {
-    const item_number = req.params.item_number;
+    const itemNumber = req.params.item_number; 
+    console.log(`Item number received for purchase: ${itemNumber}`);
 
     try {
-        // Step 1: Check availability
-        const availabilityResult = await new Promise((resolve, reject) => {
-            const select_query = `SELECT stock FROM catalog WHERE item_number = ?`;
-            db.get(select_query, [item_number], (err, row) => {
-                if (err) {
-                    return reject({ status: 500, message: 'Error querying catalog: ' + err.message });
-                }
-                if (!row) {
-                    return reject({ status: 404, message: 'Item not found' });
-                }
-                resolve(row);
-            });
-        });
-
-        if (availabilityResult.stock <= 0) {
-            return res.status(400).json({ error: 'Item is sold out' });
-        }
-
-        // Step 2: Proceed with the purchase
-        const result = await orderService.purchaseItem(item_number);
+        const result = await orderService.purchaseItem(itemNumber); // Call the service function
         res.json(result);
-
+        console.log('Purchase successful:', result);
     } catch (error) {
         res.status(error.status || 500).json({ error: error.message });
+        console.error('Purchase error:', error.message);
     }
 };
+
 
 
 
