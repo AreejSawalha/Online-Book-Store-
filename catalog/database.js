@@ -1,13 +1,15 @@
+// database.js
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./catalog.db', (err) => {
+
+const catalogDb = new sqlite3.Database('./catalog.db', (err) => {
     if (err) {
         console.error('Error opening database: ' + err.message);
     } else {
         console.log('Connected to the SQLite database.');
 
-        
-        db.serialize(() => {
-            db.run(`CREATE TABLE IF NOT EXISTS catalog (
+        // Create catalog table and insert sample data
+        catalogDb.serialize(() => {
+            catalogDb.run(`CREATE TABLE IF NOT EXISTS catalog (
                 item_number INTEGER PRIMARY KEY,
                 title TEXT,
                 stock INTEGER,
@@ -25,7 +27,6 @@ const db = new sqlite3.Database('./catalog.db', (err) => {
     }
 });
 
-
 const insertSampleData = () => {
     const sampleData = [
         { item_number: 1, title: 'Distributed Systems', stock: 10, price: 29.99, topic: 'Computer Science' },
@@ -41,7 +42,7 @@ const insertSampleData = () => {
         { item_number: 11, title: 'Deep Learning', stock: 8, price: 54.99, topic: 'AI' }
     ];
 
-    const stmt = db.prepare(`INSERT OR IGNORE INTO catalog (item_number, title, stock, price, topic) VALUES (?, ?, ?, ?, ?)`);
+    const stmt = catalogDb.prepare(`INSERT OR IGNORE INTO catalog (item_number, title, stock, price, topic) VALUES (?, ?, ?, ?, ?)`);
     sampleData.forEach(data => {
         stmt.run(data.item_number, data.title, data.stock, data.price, data.topic, (err) => {
             if (err) {
@@ -56,7 +57,7 @@ const insertSampleData = () => {
 
 // Close the database connection when done
 process.on('exit', () => {
-    db.close((err) => {
+    catalogDb.close((err) => {
         if (err) {
             console.error('Error closing database: ' + err.message);
         } else {
@@ -65,4 +66,4 @@ process.on('exit', () => {
     });
 });
 
-module.exports = db;
+module.exports = catalogDb; // Export the db instance

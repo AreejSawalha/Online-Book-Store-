@@ -3,7 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./database.db'); // Specify your database file
 const axios = require('axios');
 const http = require('http');
-
+const orderService = require('../services/frontedservice');
 module.exports = db; // Export the db instance
 
 
@@ -51,11 +51,43 @@ const getItemInfo = async (req, res) => {
 
 
 
+const purchaseController = async (req, res) => {
+    const item_number = req.params.item_number;
+
+    try {
+        // Step 1: Check availability
+        const availabilityResult = await new Promise((resolve, reject) => {
+            const select_query = `SELECT stock FROM catalog WHERE item_number = ?`;
+            db.get(select_query, [item_number], (err, row) => {
+                if (err) {
+                    return reject({ status: 500, message: 'Error querying catalog: ' + err.message });
+                }
+                if (!row) {
+                    return reject({ status: 404, message: 'Item not found' });
+                }
+                resolve(row);
+            });
+        });
+
+        if (availabilityResult.stock <= 0) {
+            return res.status(400).json({ error: 'Item is sold out' });
+        }
+
+        // Step 2: Proceed with the purchase
+        const result = await orderService.purchaseItem(item_number);
+        res.json(result);
+
+    } catch (error) {
+        res.status(error.status || 500).json({ error: error.message });
+    }
+};
+
 
 
 // Export the functions
 module.exports = {
     searchItems,
-    getItemInfo
+    getItemInfo,
+    purchaseController
    
 };
