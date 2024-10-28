@@ -4,10 +4,13 @@ const router = express.Router();
 const {
     searchItems,
     getItemInfo,
-    purchaseItem
+    purchaseController
 } = require('../controllers/FrontendController'); // Import controller functions
 
 
+
+// Define the purchase route
+router.post('/purchase/:item_number', purchaseController);
 router.get('/search/:topic', searchItems);
 router.get('/info/:item_number', getItemInfo);
 
