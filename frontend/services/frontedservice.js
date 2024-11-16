@@ -1,4 +1,55 @@
 const axios = require('axios');
+const { createOrder } = require('C:/Users/ibtis/OneDrive/Desktop/DOSproj2/Online-Book-Store-/order/services/OrderService.js');
+// Ensure catalog table exists
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS catalog (
+        item_number INTEGER PRIMARY KEY,
+        stock INTEGER NOT NULL
+    )`);
+});
+
+/*const purchaseItem = (item_number) => {
+    return new Promise((resolve, reject) => {
+        const select_query = `SELECT stock FROM catalog WHERE item_number = ?`;
+        
+        db.get(select_query, [item_number], (err, row) => {
+            if (err) {
+                return reject({ status: 500, message: 'Error querying catalog: ' + err.message });
+            }
+
+            if (!row) {
+                console.log(`Item not found for item_number: ${item_number}`);
+                return reject({ status: 404, message: 'Item not found' });
+            }
+
+            if (row.stock > 0) {
+                const insert_query = `INSERT INTO orders (item_number) VALUES (?)`;
+                
+                db.run(insert_query, [item_number], function (err) {
+                    if (err) {
+                        return reject({ status: 500, message: 'Error inserting order: ' + err.message });
+                    }
+
+                    const updatedStock = row.stock - 1;
+                    const update_query = `UPDATE catalog SET stock = ? WHERE item_number = ?`;
+
+                    db.run(update_query, [updatedStock, item_number], (err) => {
+                        if (err) {
+                            return reject({ status: 500, message: 'Error updating stock: ' + err.message });
+                        }
+
+                        resolve({
+                            message: 'Purchase successful',
+                            order_id: this.lastID
+                        });
+                    });
+                });
+            } else {
+                reject({ status: 400, message: 'Item is sold out' });
+            }
+        });
+    });
+};*/
 const { createOrder } = require('C:/Users/user/Pictures/DOS/ProjectDosPart2/Online-Book-Store-/order/services/OrderService.js');
 
 const purchaseItem = async (itemNumber) => {
