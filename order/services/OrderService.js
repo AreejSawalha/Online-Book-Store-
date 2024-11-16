@@ -1,5 +1,27 @@
 const db = require('../database');
+//
+const sqlite3 = require('sqlite3').verbose();
 
+// Connect to the primary database
+const dbPrimary = new sqlite3.Database('./orders.sqlite', (err) => {
+    if (err) {
+        console.error('Error connecting to the primary database:', err.message);
+    } else {
+        console.log('Connected to the primary database.');
+    }
+});
+
+// Connect to the replica database
+const dbReplica = new sqlite3.Database('./order_replica1.sqlite', (err) => {
+    if (err) {
+        console.error('Error connecting to the replica database:', err.message);
+    } else {
+        console.log('Connected to the replica database.');
+    }
+});
+
+
+//
 // Create a new order
 const createOrder = (customer_name, total, items, callback) => {
     const orderDate = new Date().toISOString(); 
