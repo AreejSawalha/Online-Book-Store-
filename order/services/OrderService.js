@@ -1,4 +1,6 @@
 const db = require('../database');
+const axios = require('axios');
+
 //
 const sqlite3 = require('sqlite3').verbose();
 
@@ -55,7 +57,7 @@ const getOrderById = (order_id, callback) => {
 };
 
 // Update an existing order
-const updateOrder = (order_id, total, items, callback) => {
+/*const updateOrder = (order_id, total, items, callback) => {
     db.run(`UPDATE orders SET total = ?, items = ? WHERE order_id = ?`,
         [total, items, order_id], function (err) {
             if (err) {
@@ -63,8 +65,31 @@ const updateOrder = (order_id, total, items, callback) => {
             }
             callback(null, this.changes); 
         });
-};
+};*/
+const updateOrder = (order_id, total, items, callback) => {
+    const query = `UPDATE orders SET total = ?, items = ? WHERE order_id = ?`;
+    const params = [total, items, order_id];
 
+    // Update primary database
+    db.run(query, params, function (err) {
+        if (err) {
+            return callback(err);
+        }
+        console.log(`Primary database updated: ${this.changes} rows affected`);
+
+        // Send update to replica service
+        axios.put(`http://localhost:5005/order/update/${order_id}`, { total, items })
+        .then(response => {
+            console.log('Replica service response:', response.data);
+            callback(null, this.changes);
+        })
+        .catch(error => {
+            console.error('Replica service error:', error.response?.data || error.message);
+            callback(error);
+        });
+
+    });
+};
 // Delete an order
 const deleteOrder = (order_id, callback) => {
     db.run(`DELETE FROM orders WHERE order_id = ?`, [order_id], function (err) {
